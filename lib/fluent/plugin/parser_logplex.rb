@@ -4,15 +4,11 @@ module Fluent
       # Parses syslog-formatted messages[1], framed using syslog TCP protocol octet counting framing method[2]
       # [1] https://tools.ietf.org/html/rfc5424#section-6
       # [2] https://tools.ietf.org/html/rfc6587#section-3.4.1
-      HTTPS_REGEXP = /^([0-9]+)\s+\<(?<pri>[0-9]+)\>[0-9]* (?<time>[^ ]*) (?<drain_id>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*) (?<pid>[a-zA-Z0-9\.]+)? *- *(?<message>.*)$/
+      HTTPS_REGEXP = /^([0-9]+)\s+\<(?<pri>[0-9]+)\>[0-9]* (?<time>[^ ]*) (?<drain_id>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*) (?<pid>[a-zA-Z0-9\.\-\_]+)? *- *(?<message>.*)$/
 
       FACILITY_MAP = Fluent::Plugin::SyslogInput::FACILITY_MAP
       # Constant was renamed in 1.7.3.
-      PRIORITY_MAP = if Gem::Version.new(Fluent::VERSION) >= Gem::Version.new('1.7.3')
-                       Fluent::Plugin::SyslogInput::SEVERITY_MAP
-                     else
-                       Fluent::Plugin::SyslogInput::PRIORITY_MAP
-                     end
+      PRIORITY_MAP = Fluent::Plugin::SyslogInput::SEVERITY_MAP
 
       # https://tools.ietf.org/html/rfc5424#section-6.2.1 describes FACILITY
       # as multiplied by 8 (3 bits), so this is used to shift the values to
