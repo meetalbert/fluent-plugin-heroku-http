@@ -50,10 +50,12 @@ class HerokuHttpInputTest < Test::Unit::TestCase
 
     tests = [
       '59 <13>1 2014-01-29T06:25:52.589365+00:00 host app web.1 - foo',
-      '59 <13>1 2014-01-30T07:35:00.123456+09:00 host app web.1 - bar'
+      '59 <13>1 2014-01-30T07:35:00.123456+09:00 host app web.1 - bar',
+      '59 <13>1 2014-01-30T07:35:00.123456+09:00 host app advanced-scheduler.1123 - bar',
+      '59 <13>1 2014-01-30T07:35:00.123456+09:00 host app investing_worker.2 - {test: field}',
     ]
 
-    d.run(expect_records: 2) do
+    d.run(expect_records: 4) do
       res = post(tests)
       assert_equal '200', res.code
     end
@@ -72,6 +74,24 @@ class HerokuHttpInputTest < Test::Unit::TestCase
       'ident' => 'app',
       'pid' => 'web.1',
       'message' => 'bar',
+      'facility' => 'user',
+      'priority' => 'notice'
+    }]
+
+    assert_equal d.events[2], ['heroku', time_parser.parse('2014-01-30T07:35:00.123456+09:00'), {
+      'drain_id' => 'd.fc6b856b-3332-4546-93de-7d0ee272c3bd',
+      'ident' => 'app',
+      'pid' => 'advanced-scheduler.1123',
+      'message' => 'bar',
+      'facility' => 'user',
+      'priority' => 'notice'
+    }]
+
+    assert_equal d.events[3], ['heroku', time_parser.parse('2014-01-30T07:35:00.123456+09:00'), {
+      'drain_id' => 'd.fc6b856b-3332-4546-93de-7d0ee272c3bd',
+      'ident' => 'app',
+      'pid' => 'investing_worker.2',
+      'message' => '{test: field}',
       'facility' => 'user',
       'priority' => 'notice'
     }]
